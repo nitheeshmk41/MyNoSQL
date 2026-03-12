@@ -1,0 +1,5 @@
+{"name":"Alice","age":30,"email":"alice@example.com","role":"admin","scores":[90,85,92],"address":{"city":"New York","zip":"10001"},"_id":"69b2e708ec2e982cfbb4b0b4"}
+{"name":"Bob","age":25,"email":"bob@example.com","role":"user","scores":[75,80,88],"address":{"city":"Boston","zip":"02101"},"_id":"69b2e708ec2e982cfbb4b0b5"}
+{"name":"Charlie","age":35,"email":"charlie@example.com","role":"user","scores":[95,98,100],"address":{"city":"New York","zip":"10002"},"_id":"69b2e708ec2e982cfbb4b0b6"}
+{"name":"Diana","age":28,"email":"diana@example.com","role":"admin","scores":[88,91,87],"address":{"city":"Chicago","zip":"60601"},"_id":"69b2e708ec2e982cfbb4b0b7"}
+{"name":"Eve","age":22,"email":"eve@example.com","role":"user","scores":[70,65,72],"address":{"city":"Boston","zip":"02102"},"_id":"69b2e708ec2e982cfbb4b0b8"}
