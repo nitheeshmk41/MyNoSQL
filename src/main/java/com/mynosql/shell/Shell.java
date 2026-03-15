@@ -510,7 +510,7 @@ public class Shell {
         System.out.printf("  %-48s %s%n", command(commandText), description);
     }
 
-    private void printStringList(String title, Collection<String> items, String emptyMessage) {
+    private void printStringList(String title, java.util.Collection<String> items, String emptyMessage) {
         printSection(title);
         if (items.isEmpty()) {
             printInfo(emptyMessage);
