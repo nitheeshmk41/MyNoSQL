@@ -128,7 +128,7 @@ java -cp "out;lib/gson-2.10.1.jar" com.mynosql.Main --shell
 > java -cp "out:lib/gson-2.10.1.jar" com.mynosql.Main
 > ```
 
-### Share with Others (Windows ZIP or EXE)
+### Share with Others (Windows ZIP)
 
 #### Option 1: Native Windows EXE installer
 
@@ -137,6 +137,16 @@ If you want users to launch via an `.exe`, build with `jpackage` (included in mo
 ```bat
 scripts\build-exe.bat
 ```
+
+For a simple distributable ZIP (recommended for sharing):
+
+```bat
+scripts\build-zip.bat
+```
+
+Output:
+
+- `dist/MyNoSQL-<version>-windows-app.zip`
 
 Output:
 
@@ -154,28 +164,31 @@ When you make changes and want to send an updated Windows build:
 
 1. Rebuild the app with either `scripts\build-exe.bat` or `scripts\build-app-image.bat`.
 2. Increase the project version in `pom.xml` if you want users to see a new version number.
-3. Share the new installer or the new zipped app folder.
+3. Share the new zipped app folder.
 4. If you are sharing the app-image folder, users should replace the whole folder, not just `MyNoSQL.exe`.
 
 Recommended update flow:
 
 - Small internal sharing: rebuild `dist-app/`, zip `dist-app/MyNoSQL/`, and send the zip.
-- Public release: create a GitHub Release so the workflow attaches the new JAR and Windows package automatically.
+- Public release: create a GitHub Release so the workflow attaches the new Windows ZIP automatically.
 
 #### Option 2: Automatic release artifacts via GitHub Actions
 
 This repository includes a workflow at `.github/workflows/release-artifacts.yml` that:
 
 - Builds and uploads a Windows ZIP app bundle containing `MyNoSQL.exe`.
-- Builds and uploads Windows EXE installer artifacts.
-- Automatically attaches both of them to a GitHub Release when a release is published.
+- Automatically attaches it to a GitHub Release when a release is published.
 
 You can also run it manually from the Actions tab using `workflow_dispatch`.
 
 Recommended GitHub release assets for users:
 
-- `MyNoSQL-<version>-windows-app.zip` for simple download and extract.
-- `MyNoSQL-<version>-setup.exe` for installer-style Windows setup.
+- `MyNoSQL-<version>-windows-app.zip` (recommended) for simple download and extract.
+
+Recommendation:
+
+- Prefer `MyNoSQL-<version>-windows-app.zip` as the default download for first-time users.
+- New unsigned installer EXEs may trigger stronger SmartScreen reputation warnings than ZIP-distributed app bundles.
 
 ---
 

@@ -12,7 +12,7 @@ permissions:
   contents: write
 
 jobs:
-  build-windows-exe:
+  build-windows-zip:
     runs-on: windows-latest
     steps:
       - name: Checkout
@@ -31,39 +31,10 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      - name: Install WiX Toolset
-        shell: powershell
-        run: choco install wixtoolset --no-progress -y
-
-      - name: Add WiX to PATH
-        shell: powershell
-        run: |
-          $candle = Get-Command candle.exe -ErrorAction SilentlyContinue
-          if ($candle) {
-            $wixBin = Split-Path $candle.Source
-          } else {
-            $candidates = @(
-              "$env:ProgramFiles(x86)\WiX Toolset v3.14\bin",
-              "$env:ProgramFiles(x86)\WiX Toolset v3.11\bin",
-              "$env:ProgramFiles(x86)\WiX Toolset v3.10\bin",
-              "$env:ProgramFiles\WiX Toolset v3.14\bin"
-            )
-            $wixBin = $candidates | Where-Object { Test-Path (Join-Path $_ 'candle.exe') } | Select-Object -First 1
-          }
-
-          if (-not $wixBin) {
-            throw "WiX Toolset was installed but candle.exe was not found."
-          }
-
-          $wixBin | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-          Write-Host "WiX bin path added: $wixBin"
-
       - name: Verify packaging tools
         shell: powershell
         run: |
           where.exe jpackage
-          where.exe candle.exe
-          where.exe light.exe
 
       - name: Build shaded jar
         shell: cmd
@@ -100,50 +71,14 @@ jobs:
             -DestinationPath dist/MyNoSQL-${{ steps.app_version.outputs.version }}-windows-app.zip `
             -Force
 
-      - name: Create EXE with jpackage
-        shell: powershell
-        run: |
-          $jar = Get-ChildItem target -Filter 'mynosql-*.jar' |
-            Where-Object { $_.Name -notlike 'original-*' } |
-            Select-Object -First 1
-
-          if (-not $jar) {
-            throw "Could not find packaged JAR in target/."
-          }
-
-          New-Item -Path dist -ItemType Directory -Force | Out-Null
-
-          jpackage `
-            --type exe `
-            --name MyNoSQL `
-            --input target `
-            --main-jar $jar.Name `
-            --main-class com.mynosql.Main `
-            --dest dist `
-            --win-console
-
-          $exe = Get-ChildItem dist -Filter '*.exe' | Select-Object -First 1
-          if (-not $exe) {
-            throw "Could not find generated EXE in dist/."
-          }
-
-          Rename-Item `
-            -Path $exe.FullName `
-            -NewName ("MyNoSQL-{0}-setup.exe" -f "${{ steps.app_version.outputs.version }}") `
-            -Force
-
-      - name: Upload Windows artifacts
+      - name: Upload Windows ZIP artifact
         uses: actions/upload-artifact@v4
         with:
-          name: mynosql-windows-release
-          path: |
-            dist/*.exe
-            dist/*.zip
+          name: mynosql-windows-zip
+          path: dist/*.zip
 
-      - name: Attach Windows artifacts to GitHub release
+      - name: Attach Windows ZIP to GitHub release
         if: github.event_name == 'release'
         uses: softprops/action-gh-release@v2
         with:
-          files: |
-            dist/*.exe
-            dist/*.zip
+          files: dist/*.zip
