@@ -190,6 +190,18 @@ Recommendation:
 - Prefer `MyNoSQL-<version>-windows-app.zip` as the default download for first-time users.
 - New unsigned installer EXEs may trigger stronger SmartScreen reputation warnings than ZIP-distributed app bundles.
 
+Optional: Sign the Windows app for better SmartScreen trust
+
+The release workflow can sign `MyNoSQL.exe` inside the app bundle when these repository secrets are configured:
+
+- `WINDOWS_CERT_BASE64`: Base64 content of your `.pfx` code-signing certificate.
+- `WINDOWS_CERT_PASSWORD`: Password for the `.pfx` certificate.
+
+Notes:
+
+- A standard code-signing certificate improves trust.
+- Best SmartScreen reputation results usually come from an EV code-signing certificate.
+
 ---
 
 ## Usage
