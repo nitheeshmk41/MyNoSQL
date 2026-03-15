@@ -2,7 +2,7 @@
 setlocal
 
 REM Build a self-contained runnable JAR with dependencies
-call mvnw.cmd -q clean package
+call mvnw.cmd -q package
 if errorlevel 1 (
   echo Maven build failed.
   exit /b 1

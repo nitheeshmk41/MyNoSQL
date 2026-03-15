@@ -44,7 +44,7 @@ if errorlevel 1 (
   exit /b 1
 )
 
-call mvnw.cmd -q clean package
+call mvnw.cmd -q package
 if errorlevel 1 (
   echo Maven build failed.
   exit /b 1
@@ -66,6 +66,11 @@ if "%MAIN_JAR%"=="" (
 )
 
 if exist dist rmdir /s /q dist
+if exist dist (
+  echo Could not remove dist\
+  echo Close any installer or file explorer window using dist and try again.
+  exit /b 1
+)
 mkdir dist
 
 "%JPACKAGE_EXE%" ^

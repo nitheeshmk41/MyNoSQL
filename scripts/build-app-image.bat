@@ -23,7 +23,7 @@ if not defined JPACKAGE_EXE (
   exit /b 1
 )
 
-call mvnw.cmd -q clean package
+call mvnw.cmd -q package
 if errorlevel 1 (
   echo Maven build failed.
   exit /b 1
@@ -45,6 +45,11 @@ if "%MAIN_JAR%"=="" (
 )
 
 if exist dist-app rmdir /s /q dist-app
+if exist dist-app (
+  echo Could not remove dist-app\
+  echo Close any running MyNoSQL app from dist-app and try again.
+  exit /b 1
+)
 mkdir dist-app
 
 "%JPACKAGE_EXE%" ^
