@@ -1,0 +1,98 @@
+name: Release Artifacts
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-jar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Make wrapper executable
+        run: chmod +x ./mvnw
+
+      - name: Build shaded jar
+        run: ./mvnw -B clean package
+
+      - name: Upload JAR artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mynosql-jar
+          path: |
+            target/mynosql-*.jar
+            !target/original-*.jar
+
+      - name: Attach JAR to GitHub release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            target/mynosql-*.jar
+            !target/original-*.jar
+
+  build-windows-exe:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Install WiX Toolset
+        shell: powershell
+        run: choco install wixtoolset --no-progress -y
+
+      - name: Build shaded jar
+        shell: cmd
+        run: mvnw.cmd -B clean package
+
+      - name: Create EXE with jpackage
+        shell: powershell
+        run: |
+          $jar = Get-ChildItem target -Filter 'mynosql-*.jar' |
+            Where-Object { $_.Name -notlike 'original-*' } |
+            Select-Object -First 1
+
+          if (-not $jar) {
+            throw "Could not find packaged JAR in target/."
+          }
+
+          New-Item -Path dist -ItemType Directory -Force | Out-Null
+
+          jpackage `
+            --type exe `
+            --name MyNoSQL `
+            --input target `
+            --main-jar $jar.Name `
+            --main-class com.mynosql.Main `
+            --dest dist `
+            --win-console
+
+      - name: Upload EXE artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mynosql-windows-exe
+          path: dist/*.exe
+
+      - name: Attach EXE to GitHub release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*.exe

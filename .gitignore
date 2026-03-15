@@ -1,0 +1,9 @@
+.mvn/wrapper/apache-maven-*
+.mvn/wrapper/*.zip
+.mvn/wrapper/*.tar.gz
+dist/
+dist-app/
+dependency-reduced-pom.xml
+target/*.jar
+target/maven-archiver/
+target/maven-status/

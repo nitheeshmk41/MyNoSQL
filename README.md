@@ -103,6 +103,16 @@ Or with Maven (if installed):
 mvn clean compile
 ```
 
+Or with the included Maven Wrapper (no global Maven install required):
+
+```bash
+# Linux/macOS
+./mvnw clean compile
+
+# Windows
+mvnw.cmd clean compile
+```
+
 ### Run
 
 ```bash
@@ -117,6 +127,62 @@ java -cp "out;lib/gson-2.10.1.jar" com.mynosql.Main --shell
 > ```bash
 > java -cp "out:lib/gson-2.10.1.jar" com.mynosql.Main
 > ```
+
+### Share with Others (JAR or EXE)
+
+#### Option 1: Portable JAR (works on any OS with Java installed)
+
+Build:
+
+```bash
+./mvnw clean package
+```
+
+Share:
+
+- `target/mynosql-1.0.0.jar`
+
+Run on recipient machine:
+
+```bash
+java -jar mynosql-1.0.0.jar
+# or shell only
+java -jar mynosql-1.0.0.jar --shell
+```
+
+Windows helper script:
+
+```bat
+scripts\build-portable.bat
+```
+
+#### Option 2: Native Windows EXE installer
+
+If you want users to launch via an `.exe`, build with `jpackage` (included in modern JDKs):
+
+```bat
+scripts\build-exe.bat
+```
+
+Output:
+
+- Installer and app files in `dist/`
+
+Notes:
+
+- `jpackage` requires JDK 17+ and must be on `PATH`.
+- The generated `.exe` is Windows-specific.
+- If you need macOS/Linux native packages too, run equivalent `jpackage` commands on those OSes.
+
+#### Option 3: Automatic release artifacts via GitHub Actions
+
+This repository includes a workflow at `.github/workflows/release-artifacts.yml` that:
+
+- Builds and uploads shaded JAR artifacts.
+- Builds and uploads Windows EXE artifacts.
+- Automatically attaches both to a GitHub Release when a release is published.
+
+You can also run it manually from the Actions tab using `workflow_dispatch`.
 
 ---
 
