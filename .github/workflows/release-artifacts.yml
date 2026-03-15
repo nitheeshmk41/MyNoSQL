@@ -1,5 +1,8 @@
 name: Release Artifacts
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 on:
   release:
     types: [published]
@@ -13,7 +16,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Read app version
         id: app_version
@@ -23,7 +26,7 @@ jobs:
           "version=$($pom.project.version)" >> $env:GITHUB_OUTPUT
 
       - name: Set up Java 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "17"
@@ -31,6 +34,36 @@ jobs:
       - name: Install WiX Toolset
         shell: powershell
         run: choco install wixtoolset --no-progress -y
+
+      - name: Add WiX to PATH
+        shell: powershell
+        run: |
+          $candle = Get-Command candle.exe -ErrorAction SilentlyContinue
+          if ($candle) {
+            $wixBin = Split-Path $candle.Source
+          } else {
+            $candidates = @(
+              "$env:ProgramFiles(x86)\WiX Toolset v3.14\bin",
+              "$env:ProgramFiles(x86)\WiX Toolset v3.11\bin",
+              "$env:ProgramFiles(x86)\WiX Toolset v3.10\bin",
+              "$env:ProgramFiles\WiX Toolset v3.14\bin"
+            )
+            $wixBin = $candidates | Where-Object { Test-Path (Join-Path $_ 'candle.exe') } | Select-Object -First 1
+          }
+
+          if (-not $wixBin) {
+            throw "WiX Toolset was installed but candle.exe was not found."
+          }
+
+          $wixBin | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          Write-Host "WiX bin path added: $wixBin"
+
+      - name: Verify packaging tools
+        shell: powershell
+        run: |
+          where.exe jpackage
+          where.exe candle.exe
+          where.exe light.exe
 
       - name: Build shaded jar
         shell: cmd
