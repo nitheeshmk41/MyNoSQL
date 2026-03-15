@@ -416,7 +416,7 @@ public class Shell {
         }
         System.out.println("A beginner-friendly document database shell.");
         System.out.println(keyword("Current database:") + " " + value(currentDb.getName()));
-        System.out.println(keyword("Data directory:") + " " + value(server.getBaseDir()));
+        System.out.println(keyword("Data directory:") + " " + value(String.valueOf(server.getBaseDir())));
         System.out.println();
         System.out.println(keyword("Quick start:"));
         System.out.println("  1. Type " + command("show collections") + " to inspect the current database.");
@@ -510,15 +510,16 @@ public class Shell {
         System.out.printf("  %-48s %s%n", command(commandText), description);
     }
 
-    private void printStringList(String title, List<String> items, String emptyMessage) {
+    private void printStringList(String title, Collection<String> items, String emptyMessage) {
         printSection(title);
         if (items.isEmpty()) {
             printInfo(emptyMessage);
             return;
         }
 
-        for (int i = 0; i < items.size(); i++) {
-            System.out.println("  " + (i + 1) + ". " + value(items.get(i)));
+        int i = 1;
+        for (String item : items) {
+            System.out.println("  " + (i++) + ". " + value(item));
         }
     }
 
